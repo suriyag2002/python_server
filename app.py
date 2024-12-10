@@ -1,9 +1,9 @@
 from flask import Flask, jsonify
 import requests
 from flask_cors import CORS
+import os
 
 app = Flask(__name__)
-
 CORS(app)
 
 @app.route('/api/jobs', methods=['GET'])
@@ -20,14 +20,9 @@ def get_jobs():
     }
 
     try:
-        # Make the GET request to the Indeed API
         response = requests.get(url, headers=headers, params=params)
-
-        # Check if the response was successful
         if response.status_code == 200:
             data = response.json()
-
-            # Return the job listings as a JSON response
             return jsonify(data), 200
         else:
             return jsonify({"error": "Failed to fetch jobs"}), 500
@@ -35,4 +30,6 @@ def get_jobs():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # Bind to the port specified by Render
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=True, host='0.0.0.0', port=port)
